@@ -40,12 +40,12 @@ function downloadImageByURL(url, filePath) {
     .pipe(fs.createWriteStream(filePath));
 }
 
-downloadImageByURL('https://avatars2.githubusercontent.com/u/4008498?v=4', 
-  './tmp/testImageDownload.jpg');
 
 getRepoContributors("lighthouse-labs", "laser_shark", function(err, result) {
   console.log("Errors:", err);
   result.forEach((element) => {
     console.log(element.avatar_url);
+    downloadImageByURL(element.avatar_url, 
+      './avatar/' + element.login + '.png');
   });
 });
