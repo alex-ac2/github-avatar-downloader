@@ -1,7 +1,10 @@
 var request = require('request');
 var credentials = require('./secrets.js');
+var fs = require('fs');
+
 let githubToken = credentials.GITHUB_TOKEN;
-console.log('cred', credentials.GITHUB_TOKEN);
+
+
 
 console.log('Welcome to the GitHub Avatar Downloader!');
 
@@ -15,8 +18,8 @@ function getRepoContributors(repoOwner, repoName, cb) {
     }
   };
 
-  request(options, function(err, res, body) {
-    console.log(body);
+  request.get(options, function(err, res, body) {
+    // console.log(body);
     if (!err && res.statusCode == 200) {
       let data = JSON.parse(body);
       cb(err, data);
@@ -24,12 +27,24 @@ function getRepoContributors(repoOwner, repoName, cb) {
       cb(err, body);
     }
   }); 
-
 }
+
+function downloadImageByURL(url, filePath) {
+  request.get(url, filePath) 
+    .on('error', function(err) {
+      console.log(err);
+    })
+    .on('response', function(response) {
+      console.log('Response Status Code: ', response.statusCode);
+    })
+    .pipe(fs.createWriteStream(filePath));
+}
+
+downloadImageByURL('https://avatars2.githubusercontent.com/u/4008498?v=4', 
+  './tmp/testImageDownload.jpg');
 
 getRepoContributors("lighthouse-labs", "laser_shark", function(err, result) {
   console.log("Errors:", err);
-  console.log("Result:", result);
   result.forEach((element) => {
     console.log(element.avatar_url);
   });
